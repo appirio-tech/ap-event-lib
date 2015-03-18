@@ -14,7 +14,7 @@ public class Publisher {
         topic = new Topic(name);
     }
 
-    public void Publish(String o) throws IOException {
+    public void Publish(Object o) throws IOException {
         String json = mapper.writeValueAsString(o);
         topic.Publish(json);
     }

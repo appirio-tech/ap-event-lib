@@ -1,17 +1,23 @@
 package com.appirio.event;
 
+import com.amazonaws.auth.policy.Policy;
+import com.amazonaws.auth.policy.Principal;
+import com.amazonaws.auth.policy.Resource;
+import com.amazonaws.auth.policy.Statement;
+import com.amazonaws.auth.policy.actions.SQSActions;
+import com.amazonaws.auth.policy.conditions.ConditionFactory;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.SubscribeResult;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 //import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
-import com.amazonaws.services.sqs.model.CreateQueueRequest;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.amazonaws.services.sqs.model.*;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
+//import javax.xml.ws.AsyncHandler;
+//import javax.xml.ws.Response;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 /**
  * Created by thabo on 3/12/15.
@@ -22,7 +28,6 @@ public class Subscriber {
     //private AmazonSQSAsyncClient sqsClient = new AmazonSQSAsyncClient(new ProfileCredentialsProvider());
     private AmazonSQSClient sqs = new AmazonSQSClient(new ProfileCredentialsProvider());
     private AmazonSNSClient sns = new AmazonSNSClient(new ProfileCredentialsProvider());
-    private String topicArn;
     private String queueUrl;
 
     private Topic topic;
@@ -44,7 +49,38 @@ public class Subscriber {
         queueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
 
         String topicArn = topic.getArn();
-        sns.subscribe(topicArn, "sqs", topicArn.replaceAll("sns", "sqs") + "-" + subscriber);
+        String queueArn = getQueueArn(queueUrl);
+        AllowSNStoPublishToSQS(topicArn, queueArn);
+        SubscribeResult subscribeResult = sns.subscribe(topicArn, "sqs", queueArn);
+
+        // this causes the json that is published to be delivered as raw json to the endpoint
+        // without this the json that is published is encoded within the json and message metadata can be set
+        String subscriptionArn = subscribeResult.getSubscriptionArn();
+        sns.setSubscriptionAttributes(subscriptionArn, "RawMessageDelivery", "True");
+    }
+
+    private void AllowSNStoPublishToSQS(String topicArn, String queueArn) {
+        Statement statement = new Statement(Statement.Effect.Allow)
+            .withActions(SQSActions.SendMessage)
+            .withPrincipals(new Principal("*"))
+            .withConditions(ConditionFactory.newSourceArnCondition(topicArn))
+            .withResources(new Resource(queueArn));
+
+        Policy policy = new Policy("SubscriptionPermission")
+            .withStatements(statement);
+
+        HashMap<String, String> attributes = new HashMap<String, String>();
+        attributes.put("Policy", policy.toJson());
+        SetQueueAttributesRequest request = new SetQueueAttributesRequest(queueUrl, attributes);
+        sqs.setQueueAttributes(request);
+    }
+
+    private String getQueueArn(String queueUrl) {
+        List<String> attributeTypes = new ArrayList<String>();
+        attributeTypes.add("QueueArn");
+        attributeTypes.add("Policy");
+        GetQueueAttributesResult attributesResult = sqs.getQueueAttributes(queueUrl, attributeTypes);
+        return attributesResult.getAttributes().get("QueueArn");
     }
 
     public List<Message> getMessages() {

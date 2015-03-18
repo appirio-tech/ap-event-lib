@@ -16,11 +16,10 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         Publisher foo = new Publisher("EventTopic1");
-        Subscriber es = new Subscriber("EventTopic1", "TestClient");
+        Subscriber es = new Subscriber("EventTopic1", "TestClient3");
 
         TestModel testObj = new TestModel("Hello World");
-        foo.Publish("hello");
-
+        foo.Publish(testObj);
 
         try {
             Thread.sleep(4000);
