@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
-
 
 //import com.appirio.event.Publisher;
 /**
@@ -15,21 +15,32 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
 
+        Calendar start = Calendar.getInstance();
+
         Publisher foo = new Publisher("EventTopic1");
+        Calendar pubcreated = Calendar.getInstance();
+
         Subscriber es = new Subscriber("EventTopic1", "TestClient3");
+        Calendar subcreated = Calendar.getInstance();
 
         TestModel testObj = new TestModel("Hello World");
         foo.Publish(testObj);
+        Calendar published = Calendar.getInstance();
 
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //TestModel[] received = (TestModel[]) es.getItems(TestModel.class);
+        Object[] received = es.getItems(TestModel.class);
 
-        List<Message> messages = es.getMessages();
-        for (Message message : messages)
-            System.out.println(message.getBody());
+        Calendar finished = Calendar.getInstance();
+
+        assert received.length == 1;
+        TestModel testReceived = (TestModel) received[0];
+        assert testReceived.getTestString() == "Hello World";
+
+        System.out.println("Publish: " + (pubcreated.getTimeInMillis() - start.getTimeInMillis()) + " ms");
+        System.out.println("Subscribe: " + (subcreated.getTimeInMillis() - pubcreated.getTimeInMillis()) + " ms");
+        System.out.println("Publish Event: " + (published.getTimeInMillis() - subcreated.getTimeInMillis()) + " ms");
+        System.out.println("Event Received: " + (finished.getTimeInMillis() - published.getTimeInMillis()) + " ms");
+
     }
 
 }

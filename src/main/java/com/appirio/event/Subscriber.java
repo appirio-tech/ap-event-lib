@@ -12,9 +12,14 @@ import com.amazonaws.services.sns.model.SubscribeResult;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 //import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
 import com.amazonaws.services.sqs.model.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 //import javax.xml.ws.AsyncHandler;
 //import javax.xml.ws.Response;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -22,6 +27,7 @@ import java.util.HashMap;
 /**
  * Created by thabo on 3/12/15.
  */
+//public class Subscriber<T> {
 public class Subscriber {
     final Integer LONG_POLL_WAIT_TIME = 20;
 
@@ -29,10 +35,11 @@ public class Subscriber {
     private AmazonSQSClient sqs = new AmazonSQSClient(new ProfileCredentialsProvider());
     private AmazonSNSClient sns = new AmazonSNSClient(new ProfileCredentialsProvider());
     private String queueUrl;
+    private ObjectMapper mapper = new ObjectMapper();
 
     private Topic topic;
 
-    public Subscriber(String subscriptionTopic, String subscriber) {
+    public Subscriber(String subscriptionTopic, String subscriber) throws JsonParseException, JsonMappingException, IOException {
         sqs.setRegion(Configuration.REGION);
 
 //        AsyncHandler asyncHandler = new AsyncHandler() {
@@ -83,11 +90,29 @@ public class Subscriber {
         return attributesResult.getAttributes().get("QueueArn");
     }
 
-    public List<Message> getMessages() {
+    private List<Message> getMessages() {
         ReceiveMessageRequest rmr = new ReceiveMessageRequest();
         rmr.setQueueUrl(queueUrl);
         rmr.setWaitTimeSeconds(LONG_POLL_WAIT_TIME);
         final ReceiveMessageResult result = sqs.receiveMessage(rmr);
         return result.getMessages();
+    }
+
+//    public T[] getItems(Class<T> type) throws IOException {
+//        List<Message> messages = getMessages();
+//        final T[] items = (T[]) Array.newInstance(type, messages.size());
+//        for (int i = 0; i < messages.size(); i++) {
+//            items[i] = (T) mapper.readValue(messages.get(i).getBody(), type);
+//        }
+//        return  items;
+//    }
+
+    public Object[] getItems(Class type) throws IOException {
+        List<Message> messages = getMessages();
+        Object[] items = new Object[messages.size()];
+        for (int i = 0; i < messages.size(); i++) {
+            items[i] = mapper.readValue(messages.get(i).getBody(), type);
+        }
+        return  items;
     }
 }
