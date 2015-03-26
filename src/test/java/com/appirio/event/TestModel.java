@@ -7,6 +7,10 @@ public class TestModel {
 
     private String testString;
 
+    public TestModel() {
+
+    }
+
     public TestModel(String testString) {
         this.testString = testString;
     }
