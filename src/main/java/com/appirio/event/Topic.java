@@ -6,10 +6,10 @@ import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
 import com.amazonaws.services.sns.model.PublishRequest;
 
-import java.util.Map;
-
 /**
  * Created by thabo on 3/13/15.
+ *
+ * A topic that can be published to.
  */
 public class Topic {
     private final AmazonSNSClient client = new AmazonSNSClient(new ProfileCredentialsProvider());
