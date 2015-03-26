@@ -78,7 +78,7 @@ public class Subscriber {
         return attributesResult.getAttributes().get("QueueArn");
     }
 
-    private List<Message> getMessages() {
+    public List<Message> getMessages() {
         ReceiveMessageRequest rmr = new ReceiveMessageRequest();
         rmr.setQueueUrl(queueUrl);
         rmr.setWaitTimeSeconds(LONG_POLL_WAIT_TIME);
