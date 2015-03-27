@@ -3,7 +3,7 @@ Event Framework Library
 
 Appirio Java Microservices should use this library for asnychronous notification of events via a raw json payload. 
 
-* Publishers publish objects representing events to topics. Objects must carry a unique identifier to allowe subscribers to determine duplicate events
+* Publishers publish objects representing events to topics. Objects must carry a unique identifier to allow subscribers to determine duplicate events
 * Each subscribing application shoud identify itself by a unique application name. A subscriber may have multiple workers reading messages on the same application, but a message will be delivered at least once per subscriber. Subscribers must be capable of receiving the same event multipe times without side affect.
 
 ## Usage
