@@ -1,12 +1,7 @@
 package com.appirio.event;
 
-import com.amazonaws.services.sqs.model.Message;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 
 //import com.appirio.event.Publisher;
 /**
@@ -35,6 +30,17 @@ public class Main {
         assert received.length == 1;
         TestModel testReceived = (TestModel) received[0];
         assert testReceived.getTestString() == "Hello World";
+
+        boolean gotExc = false;
+        try {
+            foo.Publish(new BadModel("Hello Exception Land"));
+            Object[] errorExpected = es.getItems(BadModel.class);
+        } catch (AggregateIOException exc) {
+            gotExc = true;
+            assert (exc.getInternalExceptions().size() == 1);
+        }
+        assert (gotExc);
+
 
         System.out.println("Publish: " + (pubcreated.getTimeInMillis() - start.getTimeInMillis()) + " ms");
         System.out.println("Subscribe: " + (subcreated.getTimeInMillis() - pubcreated.getTimeInMillis()) + " ms");

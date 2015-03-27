@@ -10,6 +10,7 @@ public class AggregateIOException extends Exception {
     private final List<IOException> internalExceptions;
 
     public AggregateIOException(List<IOException> ioExceptions) {
+        super();
         internalExceptions = ioExceptions;
     }
 
