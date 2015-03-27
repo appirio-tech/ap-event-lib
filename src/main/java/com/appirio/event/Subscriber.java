@@ -16,9 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -91,7 +89,7 @@ public class Subscriber {
         List<Message> messages = getMessages();
         Object[] items = new Object[messages.size()];
 
-        List<IOException> deserializationErrors = new ArrayList<IOException>();
+        List<IOException> deserializationErrors = Collections.synchronizedList(new ArrayList<IOException>());
         IntStream.range(0, items.length)
             .parallel()
             .forEach(i -> {
@@ -99,7 +97,9 @@ public class Subscriber {
                 try {
                     items[i] = mapper.readValue(messageBody, type);
                 } catch (IOException e) {
-                    deserializationErrors.add(e);
+                    synchronized (deserializationErrors) {
+                        deserializationErrors.add(e); //deserializationErrors.add(e);
+                    }
                 }
             });
 
