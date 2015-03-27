@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 /**
  * Created by thabo on 3/12/15.
@@ -86,12 +87,26 @@ public class Subscriber {
         return result.getMessages();
     }
 
-    public Object[] getItems(Class type) throws IOException {
+    public Object[] getItems(Class type) throws AggregateIOException {
         List<Message> messages = getMessages();
         Object[] items = new Object[messages.size()];
-        for (int i = 0; i < messages.size(); i++) {
-            items[i] = mapper.readValue(messages.get(i).getBody(), type);
+
+        List<IOException> deserializationErrors = new ArrayList<IOException>();
+        IntStream.range(0, items.length)
+            .parallel()
+            .forEach(i -> {
+                String messageBody = messages.get(i).getBody();
+                try {
+                    items[i] = mapper.readValue(messageBody, type);
+                } catch (IOException e) {
+                    deserializationErrors.add(e);
+                }
+            });
+
+        if (deserializationErrors.size() > 0) {
+            throw new AggregateIOException(deserializationErrors);
         }
+
         return  items;
     }
 }

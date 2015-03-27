@@ -13,7 +13,7 @@ import java.util.List;
  * Created by thabo on 3/12/15.
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, AggregateIOException {
 
         Calendar start = Calendar.getInstance();
 
