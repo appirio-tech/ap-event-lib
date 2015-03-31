@@ -90,22 +90,29 @@ public class Subscriber {
         Object[] items = new Object[messages.size()];
 
         List<IOException> deserializationErrors = Collections.synchronizedList(new ArrayList<IOException>());
+        List<DeleteMessageBatchRequestEntry> receivedItems = new ArrayList<DeleteMessageBatchRequestEntry>();
         IntStream.range(0, items.length)
             .parallel()
             .forEach(i -> {
-                String messageBody = messages.get(i).getBody();
+                Message message = messages.get(i);
+                String messageBody = message.getBody();
                 try {
                     items[i] = mapper.readValue(messageBody, type);
                 } catch (IOException e) {
                     synchronized (deserializationErrors) {
-                        deserializationErrors.add(e); //deserializationErrors.add(e);
+                        deserializationErrors.add(e);
                     }
                 }
+
+                // TODO decide if we persist items on the queue that fail to deserialize
+                receivedItems.add(new DeleteMessageBatchRequestEntry(message.getMessageId(), message.getReceiptHandle()));
             });
 
-        if (deserializationErrors.size() > 0) {
+        if (receivedItems.size() > 0)
+            sqs.deleteMessageBatch(queueUrl, receivedItems);
+
+        if (deserializationErrors.size() > 0)
             throw new AggregateIOException(deserializationErrors);
-        }
 
         return  items;
     }
