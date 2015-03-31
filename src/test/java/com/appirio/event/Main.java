@@ -1,7 +1,10 @@
 package com.appirio.event;
 
+import com.fasterxml.jackson.core.JsonParseException;
+
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 //import com.appirio.event.Publisher;
 /**
@@ -9,7 +12,34 @@ import java.util.Calendar;
  */
 public class Main {
     public static void main(String[] args) throws IOException, AggregateIOException {
+        //RunTest();
+        Subscriber es = new Subscriber("MemberCertificationRegistration", "SampleSubscriber");
 
+        System.out.println("Subscribed, waiting for events. Press any key to quit.");
+        while(System.in.available() == 0) {
+            try {
+                Object[] items = es.getItems(RegistrationEventModel.class);
+                //System.out.println("Events received:");
+                for (int i = 0; i < items.length; i++) {
+                    PrintEvent((RegistrationEventModel) items[i]);
+                }
+
+            } catch (AggregateIOException e) {
+                List<IOException> inner = e.getInternalExceptions();
+                for (int i = 0; i < inner.size(); i++) {
+                    System.out.println("Unable to deserialize object on queue:");
+                    System.out.println(inner.get(i));
+                }
+            }
+        }
+        System.out.println("Bye...");
+    }
+
+    private static void PrintEvent(RegistrationEventModel regEvent) {
+        System.out.println(regEvent.getHandle() + " registered for event " + regEvent.getProgramId() + " on " + regEvent.getTimestamp());
+    }
+
+    private static void RunTest() throws IOException, AggregateIOException {
         Calendar start = Calendar.getInstance();
 
         Publisher foo = new Publisher("EventTopic1");
@@ -46,7 +76,6 @@ public class Main {
         System.out.println("Subscribe: " + (subcreated.getTimeInMillis() - pubcreated.getTimeInMillis()) + " ms");
         System.out.println("Publish Event: " + (published.getTimeInMillis() - subcreated.getTimeInMillis()) + " ms");
         System.out.println("Event Received: " + (finished.getTimeInMillis() - published.getTimeInMillis()) + " ms");
-
     }
 
 }
