@@ -1,5 +1,4 @@
-# ap-event-lib
-Event Framework Library
+# Appirio Event Framework Library
 
 Appirio Java Microservices should use this library for asnychronous notification of events via a raw json payload. 
 
