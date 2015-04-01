@@ -8,9 +8,11 @@ Appirio Java Microservices should use this library for asnychronous notification
 
 ## Credentials
 Provide AWS credentials in ~/.aws/credentials (where ~ is home directory of user running service) 
+```
 [AWS_IAM_username]
 aws_access_key_id = BLAHBLAHBLAH
 aws_secret_access_key = blahBlahBlahBlahBlah
+```
 
 ## Usage
 ```
