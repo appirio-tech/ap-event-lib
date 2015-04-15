@@ -31,8 +31,8 @@ public class TestModel {
     }
 }
 
-Publisher pub = new Publisher("TopicName");
-Subscriber sub = new Subscriber("TopicName", "ApplicationName");
+Publisher pub = new Publisher("PublisherAppName", "TopicName");
+Subscriber sub = new Subscriber("PublisherAppName", "TopicName", "SubscriberAppName");
 
 pub.Publish(new TestModel("hello"));
 
