@@ -8,4 +8,5 @@ import com.amazonaws.regions.Regions;
  */
 public class Configuration {
     public static final Region REGION = Region.getRegion(Regions.US_EAST_1);
+    public static final String DELIM = "-";
 }
