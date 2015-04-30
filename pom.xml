@@ -8,6 +8,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dropwizard-version>0.7.1</dropwizard-version>
     </properties>
     
     <repositories>
@@ -27,9 +28,8 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>[1.9.23,3.0)</version>
+            <version>[1.9.23,2.0)</version>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -39,6 +39,11 @@
         	<groupId>com.appirio</groupId>
         	<artifactId>commons-aws</artifactId>
         	<version>0.0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+        	<groupId>io.dropwizard</groupId>
+        	<artifactId>dropwizard-lifecycle</artifactId>
+        	<version>${dropwizard-version}</version>
         </dependency>
     </dependencies>
     
