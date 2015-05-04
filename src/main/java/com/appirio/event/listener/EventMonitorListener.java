@@ -42,11 +42,12 @@ public class EventMonitorListener implements MonitorListener {
 		try {
 			logger.debug("Received message {}", message.getBody());
 
-			Event event = mapper.readValue(message.getBody(), Event.class);
+			EventMessageWrapper wrapper = mapper.readValue(message.getBody(), EventMessageWrapper.class);
+			Event event = mapper.readValue(wrapper.getMessage(), Event.class);
 
 			listener.processEvent(event);
 		} catch (Exception e) {
-			logger.error("Unable to process message {}: {}", (message == null ? "null" : message.getBody()), e.getStackTrace());
+			logger.error("Unable to process message {}: {}", (message == null ? "null" : message.getBody()), e);
 			if (returnMessageOnException) {
 				try {
 					monitor.returnMessage(message);
