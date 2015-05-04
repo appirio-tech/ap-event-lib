@@ -26,6 +26,12 @@ public class EventMonitorListener implements MonitorListener {
 	private ObjectMapper mapper;
 	private boolean returnMessageOnException = true;
 
+	/**
+	 * Creates a monitor that will call a listener when events come in.
+	 * 
+	 * @param listener
+	 *            The listener invoked when new events are received.
+	 */
 	public EventMonitorListener(EventListener listener) {
 		this.listener = listener;
 		mapper = new ObjectMapper();
@@ -42,10 +48,17 @@ public class EventMonitorListener implements MonitorListener {
 		try {
 			logger.debug("Received message {}", message.getBody());
 
-//			EventMessageWrapper wrapper = mapper.readValue(message.getBody(), EventMessageWrapper.class);
+			// parse the message body into an event
+			// NOTE: expecting the SNS/SQS subscription to use
+			// "rawMessageDelivery" so that it doesn't
+			// wrap the object in another object with additional SNS attributes
 			Event event = mapper.readValue(message.getBody(), Event.class);
 
+			// call the listener
 			listener.processEvent(event);
+
+			// delete the message after successful processing
+			monitor.deleteMessage(message);
 		} catch (Exception e) {
 			logger.error("Unable to process message {}: {}", (message == null ? "null" : message.getBody()), e);
 			if (returnMessageOnException) {
