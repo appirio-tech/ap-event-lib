@@ -42,8 +42,8 @@ public class EventMonitorListener implements MonitorListener {
 		try {
 			logger.debug("Received message {}", message.getBody());
 
-			EventMessageWrapper wrapper = mapper.readValue(message.getBody(), EventMessageWrapper.class);
-			Event event = mapper.readValue(wrapper.getMessage(), Event.class);
+//			EventMessageWrapper wrapper = mapper.readValue(message.getBody(), EventMessageWrapper.class);
+			Event event = mapper.readValue(message.getBody(), Event.class);
 
 			listener.processEvent(event);
 		} catch (Exception e) {
