@@ -4,6 +4,31 @@ Event Framework Library
 ## Overview
 This shared library provides a high-level way to publish events and listen to events. This library attempts to hide the details of the implementation of event transport. There is however some setup that needs to be done to connect endpoints. The shared library assumes this setup has already been completed.
 
+## Building
+The current version is **0.0.2-SNAPSHOT**. Include the following as a maven dependency in your pom.xml file:
+```
+    <dependency>
+  		<groupId>com.appirio</groupId>
+  		<artifactId>ap-event-lib</artifactId>
+  		<version>0.0.2-SNAPSHOT</version>
+    </dependency>
+```
+You will also need to include the Appirio maven repo if you don't already have it:
+```
+    <repositories>
+        <repository>
+            <id>Appirio Technology Maven Repository</id>
+            <url>http://maven.appirio.net:8080/</url>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>   
+```
+
 ## Publishing
 In order to publish events, a microservice will create a SNS topic for each event type that it wants to publish.
 > The assumed format for SNS topic names is `<microservice name>-<event type>`. For example, for the app-work-requests topic that sends "timeline" events, the SNS topic name is `app-work-requests-timeline`
