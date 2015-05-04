@@ -12,8 +12,12 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws IOException, AggregateIOException {
-        //RunTest();
-        Subscriber es = new Subscriber("MemberCertificationRegistration", "SampleSubscriber");
+        RunTest();
+        //RunDemoSubscriber();
+    }
+
+    private static void RunDemoSubscriber() throws IOException, AggregateIOException {
+        Subscriber es = new Subscriber("SamplePublisher", "MemberCertificationRegistration", "SampleSubscriber");
 
         System.out.println("Subscribed, waiting for events. Press any key to quit.");
         while(System.in.available() == 0) {
@@ -42,10 +46,10 @@ public class Main {
     private static void RunTest() throws IOException, AggregateIOException {
         Calendar start = Calendar.getInstance();
 
-        Publisher foo = new Publisher("EventTopic1");
+        Publisher foo = new Publisher("Pubber", "EventTopic1");
         Calendar pubcreated = Calendar.getInstance();
 
-        Subscriber es = new Subscriber("EventTopic1", "TestClient3");
+        Subscriber es = new Subscriber("Pubber", "EventTopic1", "TestClient3");
         Calendar subcreated = Calendar.getInstance();
 
         TestModel testObj = new TestModel("Hello World");

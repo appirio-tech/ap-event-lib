@@ -15,8 +15,8 @@ public class Publisher {
 
     private Topic topic;
 
-    public Publisher(String name) {
-        topic = new Topic(name);
+    public Publisher(String publisher, String name) {
+        topic = new Topic(publisher + Configuration.DELIM + name);
     }
 
     public void Publish(Object o) throws IOException {

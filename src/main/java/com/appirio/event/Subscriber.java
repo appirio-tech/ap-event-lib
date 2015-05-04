@@ -34,12 +34,13 @@ public class Subscriber {
 
     private Topic topic;
 
-    public Subscriber(String subscriptionTopic, String subscriber) throws JsonParseException, JsonMappingException, IOException {
+    public Subscriber(String publisher, String subscriptionTopic, String subscriber) throws JsonParseException, JsonMappingException, IOException {
         sqs.setRegion(Configuration.REGION);
 
-        topic = new Topic(subscriptionTopic);
+        String fullTopic = publisher + Configuration.DELIM + subscriptionTopic;
+        topic = new Topic(fullTopic);
 
-        CreateQueueRequest createQueueRequest = new CreateQueueRequest(subscriptionTopic + "-" + subscriber);
+        CreateQueueRequest createQueueRequest = new CreateQueueRequest(fullTopic + Configuration.DELIM + subscriber);
         queueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
 
         String topicArn = topic.getArn();
