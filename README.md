@@ -33,6 +33,8 @@ Each microservice that wants to listen to events will need to create a SQS queue
 
 You will need to create a subscription to the SQS queue for each SNS event publisher that you want to listen to. It is important to set the **Raw message delivery** subscription attribute to *True* for each subscription you create.
 
+> While rare, it is possible that an event message is read multiple times. **Listeners should therefore be idempotent and be able to handle the same event being processed multiple times.**
+
 ### Example Usage
 ```
 // define an event listener
@@ -53,6 +55,3 @@ public void run(ExamplesServiceConfiguration config, Environment env) throws Exc
 }
 
 ```
-
-
-
