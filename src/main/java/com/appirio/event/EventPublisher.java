@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.ListTopicsResult;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EventPublisher {
 	private static final Logger logger = LoggerFactory.getLogger(EventPublisher.class);
 
-	private final AmazonSNSClient sns;
+	private final AmazonSNS sns;
 	private final String topicArnPrefix;
 	private final ObjectMapper objectMapper;
 
@@ -27,21 +29,31 @@ public class EventPublisher {
 	 * publishing.
 	 */
 	public EventPublisher(ObjectMapper objectMapper) {
+		this(objectMapper, null, null);
+	}
+
+	public EventPublisher(ObjectMapper objectMapper, String topicArnPrefix, AmazonSNS sns) {
 		this.objectMapper = objectMapper;
-		sns = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
-		logger.info("listing sns topics...");
-		// assuming that all topics the caller has access to is in the same
-		// account (the prefix will be the same for all topics in the same
-		// account)
-		ListTopicsResult res = sns.listTopics();
-		if (res.getTopics() != null && !res.getTopics().isEmpty()) {
-			final String arn = res.getTopics().get(0).getTopicArn();
-			topicArnPrefix = arn.substring(0, arn.lastIndexOf(':') + 1);
-			logger.info("topic arn prefix = {}", topicArnPrefix);
-		} else {
-			logger.error("No sns topics found");
-			throw new IllegalStateException("No sns topics found");
+		if (sns == null) {
+			sns = new AmazonSNSClient(new DefaultAWSCredentialsProviderChain());
 		}
+		this.sns = sns;
+		if (topicArnPrefix == null) {
+			logger.info("listing sns topics...");
+			// assuming that all topics the caller has access to is in the same
+			// account (the prefix will be the same for all topics in the same
+			// account)
+			ListTopicsResult res = sns.listTopics();
+			if (res.getTopics() != null && !res.getTopics().isEmpty()) {
+				final String arn = res.getTopics().get(0).getTopicArn();
+				topicArnPrefix = arn.substring(0, arn.lastIndexOf(':') + 1);
+				logger.info("topic arn prefix = {}", topicArnPrefix);
+			} else {
+				logger.error("No sns topics found");
+				throw new IllegalStateException("No sns topics found");
+			}
+		}
+		this.topicArnPrefix = topicArnPrefix;
 	}
 
 	/**
@@ -71,8 +83,8 @@ public class EventPublisher {
 		String arn = getTopicArn(event.getSourceObjectType(), event.getEventType());
 
 		logger.debug("publishing to {}. event = {}", arn, json);
-		sns.publish(arn, json);
-		logger.debug("event published");
+		PublishResult res = sns.publish(arn, json);
+		logger.debug("published event with result message id = {}", res.getMessageId());
 	}
 
 	private String getTopicArn(String objectType, String eventType) {

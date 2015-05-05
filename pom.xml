@@ -9,6 +9,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dropwizard-version>0.7.1</dropwizard-version>
+        <aws-version>[1.9.23,2.0)</aws-version>
     </properties>
     
     <repositories>
@@ -27,8 +28,18 @@
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>[1.9.23,2.0)</version>
+            <artifactId>aws-java-sdk-core</artifactId>
+	    <version>${aws-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sqs</artifactId>
+	    <version>${aws-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sns</artifactId>
+	    <version>${aws-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -44,6 +55,25 @@
         	<groupId>io.dropwizard</groupId>
         	<artifactId>dropwizard-lifecycle</artifactId>
         	<version>${dropwizard-version}</version>
+        </dependency>
+        
+        <!-- <dependency>
+    		<groupId>org.elasticmq</groupId>
+		    <artifactId>elasticmq-rest-sqs_2.11</artifactId>
+		    <version>0.8.8</version>
+		    <scope>test</scope>
+		</dependency> -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.0.6-beta</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+        	<groupId>org.easytesting</groupId>
+        	<artifactId>fest-assert-core</artifactId>
+        	<version>2.0M10</version>
+        	<scope>test</scope>
         </dependency>
     </dependencies>
     
