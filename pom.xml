@@ -37,4 +37,30 @@
             </plugin>
     	</plugins>
 	</build>
+    <repositories>
+        <repository>
+            <id>Appirio Technology Maven Repository</id>
+            <url>http://maven.appirio.net:8080/</url>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <!-- for deployment on the build server -->
+        <repository>
+            <id>appirio-repo</id>
+            <name>Appirio Maven Repository</name>
+            <url>file:///mnt/maven/repository</url>
+        </repository>
+        <snapshotRepository>
+            <id>appirio-repo</id>
+            <name>Appirio Maven Repository</name>
+            <url>file:///mnt/maven/repository</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
